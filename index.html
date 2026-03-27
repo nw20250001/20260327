@@ -54,7 +54,6 @@
 
         #print-area::-webkit-scrollbar { display: none; }
 
-        /* History Panel Overlay */
         #history-panel {
             transition: transform 0.3s ease-in-out;
             transform: translateX(100%);
@@ -78,7 +77,6 @@
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Header -->
     <header class="bg-slate-900 text-white p-4 sticky top-0 z-[100] flex justify-between items-center shadow-lg">
         <div class="flex items-center gap-2">
             <i data-lucide="file-text" class="text-red-500"></i>
@@ -89,7 +87,7 @@
                 <i data-lucide="history" size="22"></i>
                 <span id="history-badge" class="absolute top-0 right-0 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
             </button>
-            <button id="save-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+            <button id="save-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 transition-all active:scale-95">
                 <i data-lucide="save" size="18"></i>
                 <span class="hidden sm:inline">儲存</span>
             </button>
@@ -101,19 +99,16 @@
     </header>
 
     <main class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 p-4 md:p-8">
-        
-        <!-- 左側控制面板 -->
         <div class="w-full lg:w-[400px] flex flex-col gap-6 shrink-0">
-            
             <!-- AI 助理面板 -->
             <section class="bg-gradient-to-br from-slate-800 to-indigo-900 p-6 rounded-[2rem] shadow-xl text-white">
                 <div class="flex items-center gap-2 mb-4">
                     <i data-lucide="sparkles" class="text-yellow-400"></i>
                     <h2 class="font-bold text-lg">AI 智慧助手</h2>
                 </div>
-                <textarea id="ai-input" placeholder="例如：通知住戶下週清洗水塔，暫停供水四小時..." class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-sm text-white placeholder:text-white/30 outline-none focus:bg-white/20 transition-all h-20 resize-none mb-3"></textarea>
-                <button id="ai-gen-btn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-indigo-950 py-3 rounded-2xl font-bold text-sm transition-all disabled:opacity-50">
-                    <i data-lucide="wand-2" size="18"></i>
+                <textarea id="ai-input" placeholder="例如：通知住戶下週清洗水塔，暫停供水四小時..." class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-sm text-white placeholder:text-white/40 text-sm outline-none focus:bg-white/20 transition-all h-20 resize-none mb-3"></textarea>
+                <button id="ai-gen-btn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-indigo-950 py-3 rounded-2xl font-bold text-sm transition-all disabled:opacity-50 active:scale-95">
+                    <i data-lucide="wand-2" size="18" id="ai-btn-icon"></i>
                     <span id="ai-btn-text">立即智慧生成</span>
                 </button>
                 <p id="error-msg" class="hidden mt-2 text-[10px] text-red-300 text-center"></p>
@@ -128,25 +123,25 @@
                 <div class="space-y-4">
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">社區名稱</label>
-                        <input type="text" id="community-name" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm" value="幸福綠洲社區管理委員會">
+                        <input type="text" id="community-name" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-red-500 outline-none" value="幸福綠洲社區管理委員會">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">公告字號</label>
-                            <input type="text" id="notice-id" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm" value="1140852">
+                            <input type="text" id="notice-id" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-red-500 outline-none" value="1140852">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">公告日期</label>
-                            <input type="text" id="notice-date-input" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                            <input type="text" id="notice-date-input" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-red-500 outline-none">
                         </div>
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">公告主旨</label>
-                        <input type="text" id="subject" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" placeholder="輸入公告主旨">
+                        <input type="text" id="subject" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-red-500 outline-none" placeholder="輸入公告主旨">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">說明內容</label>
-                        <textarea id="description" rows="10" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed resize-none" placeholder="輸入詳細說明內容"></textarea>
+                        <textarea id="description" rows="12" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed resize-none focus:border-red-500 outline-none" placeholder="輸入詳細說明內容"></textarea>
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-2">
                         <input type="text" id="department" placeholder="發佈單位" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs" value="物業管理中心 敬啟">
@@ -160,59 +155,58 @@
         <div class="flex-grow flex flex-col items-center overflow-visible relative">
             <div class="mb-4 text-xs font-bold text-slate-400 flex items-center gap-2 uppercase tracking-widest">
                 <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                A4 標準預覽面板
+                A4 標準預覽面板 (已縮小字體增加說明空間)
             </div>
             
             <div class="relative w-full flex justify-center preview-container">
-                <!-- A4 畫布 -->
                 <div id="print-area" class="overflow-hidden">
-                    <div class="h-full w-full p-[20mm] flex flex-col text-black font-serif-tc bg-white box-border">
+                    <div class="h-full w-full p-[15mm] flex flex-col text-black font-serif-tc bg-white box-border">
                         
-                        <!-- 頁首 -->
-                        <div class="text-center border-b-[6px] border-red-600 pb-4 mb-6 shrink-0">
-                            <h1 class="text-5xl font-black text-red-600 mb-2 tracking-[0.8em] ml-[0.8em]">公告</h1>
-                            <div id="view-community-name" class="text-xl font-bold tracking-[0.3em] uppercase">幸福綠洲社區管理委員會</div>
+                        <!-- 頁首 (縮小版) -->
+                        <div class="text-center border-b-[5px] border-red-600 pb-3 mb-4 shrink-0">
+                            <h1 class="text-4xl font-black text-red-600 mb-1 tracking-[0.8em] ml-[0.8em]">公告</h1>
+                            <div id="view-community-name" class="text-lg font-bold tracking-[0.3em] uppercase">幸福綠洲社區管理委員會</div>
                         </div>
 
-                        <!-- 元數據 -->
-                        <div class="flex justify-between items-end mb-6 font-bold text-base shrink-0">
-                            <div class="border-b-[1px] border-slate-800 pb-0.5 px-3 text-slate-700">
+                        <!-- 元數據 (縮小版) -->
+                        <div class="flex justify-between items-end mb-4 font-bold text-sm shrink-0">
+                            <div class="border-b-[1px] border-slate-800 pb-0.5 px-2 text-slate-700">
                                 字第 <span id="view-id">1140852</span> 號
                             </div>
                             <div class="text-slate-700">中華民國 <span id="view-date">2025年4月1日</span></div>
                         </div>
 
-                        <!-- 主旨 -->
-                        <div class="bg-slate-50 border-l-[12px] border-slate-800 p-6 mb-6 shrink-0 shadow-sm">
-                            <span class="text-[10px] font-black text-slate-400 block mb-1 tracking-[0.2em]">【 公告主旨 SUBJECT 】</span>
-                            <h2 id="view-subject" class="text-2xl font-black leading-tight text-slate-900 min-h-[1.2em]">
+                        <!-- 主旨 (縮減高度) -->
+                        <div class="bg-slate-50 border-l-[10px] border-slate-800 p-4 mb-4 shrink-0 shadow-sm">
+                            <span class="text-[9px] font-black text-slate-400 block mb-1 tracking-[0.1em]">【 主旨 SUBJECT 】</span>
+                            <h2 id="view-subject" class="text-xl font-black leading-tight text-slate-900 min-h-[1.2em]">
                                 請輸入或生成主旨
                             </h2>
                         </div>
 
-                        <!-- 說明內容 -->
-                        <div class="flex-grow overflow-hidden px-2">
-                            <span class="text-[10px] font-black text-slate-400 block mb-3 tracking-[0.2em]">【 說明內容 DESCRIPTION 】</span>
-                            <div id="view-description" class="text-[1.3rem] leading-[1.8] whitespace-pre-wrap text-justify font-medium text-slate-800">
+                        <!-- 說明內容 (極大化區域) -->
+                        <div class="flex-grow overflow-hidden px-1">
+                            <span class="text-[9px] font-black text-slate-400 block mb-2 tracking-[0.1em]">【 說明內容 DESCRIPTION 】</span>
+                            <div id="view-description" class="text-[1.25rem] leading-[1.75] whitespace-pre-wrap text-justify font-medium text-slate-800">
                                 請輸入詳細說明內容...
                             </div>
                         </div>
 
-                        <!-- 頁尾用印 -->
-                        <div class="mt-6 pt-6 border-t border-slate-100 shrink-0 flex justify-between items-end">
-                            <div class="max-w-[50%] space-y-2">
-                                <div class="flex items-center gap-2 text-slate-400 text-xs italic">
-                                    <i data-lucide="phone" size="12"></i>
+                        <!-- 頁尾 (縮減間距) -->
+                        <div class="mt-4 pt-4 border-t border-slate-100 shrink-0 flex justify-between items-end">
+                            <div class="max-w-[50%] space-y-1">
+                                <div class="flex items-center gap-1.5 text-slate-400 text-[10px] italic">
+                                    <i data-lucide="phone" size="10"></i>
                                     <span id="view-footer">如有疑問請洽櫃台</span>
                                 </div>
-                                <div class="h-1 w-16 bg-red-600"></div>
+                                <div class="h-1 w-12 bg-red-600"></div>
                             </div>
                             
                             <div class="text-right">
-                                <div id="view-community-name-foot" class="text-lg font-bold text-slate-600">幸福綠洲社區</div>
-                                <div id="view-department" class="text-3xl font-black mt-1 tracking-tighter text-slate-900">物業管理中心 敬啟</div>
+                                <div id="view-community-name-foot" class="text-base font-bold text-slate-600 leading-none">幸福綠洲社區</div>
+                                <div id="view-department" class="text-2xl font-black mt-1 tracking-tighter text-slate-900 leading-none">物業管理中心 敬啟</div>
                                 <div class="mt-2 flex justify-end">
-                                    <div class="w-24 h-24 border-2 border-red-500/20 rounded-full flex items-center justify-center text-red-500/20 font-black text-lg border-dashed transform rotate-12 select-none">
+                                    <div class="w-20 h-20 border-2 border-red-500/20 rounded-full flex items-center justify-center text-red-500/20 font-black text-sm border-dashed transform rotate-12 select-none">
                                         管委會印
                                     </div>
                                 </div>
@@ -224,29 +218,24 @@
         </div>
     </main>
 
-    <!-- 歷史紀錄面板 -->
-    <div id="history-panel" class="fixed top-0 right-0 h-full w-full sm:w-[350px] bg-white shadow-2xl z-[200] flex flex-col">
+    <div id="history-panel" class="fixed top-0 right-0 h-full w-full sm:w-[350px] bg-white shadow-2xl z-[200] flex flex-col border-l border-slate-200">
         <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i data-lucide="history" size="20" class="text-red-500"></i>
                 <h2 class="font-bold">歷史公告紀錄</h2>
             </div>
-            <button id="close-history" class="p-1 hover:bg-slate-700 rounded-lg">
+            <button id="close-history" class="p-1 hover:bg-slate-700 rounded-lg transition-colors">
                 <i data-lucide="x" size="24"></i>
             </button>
         </div>
-        <div id="history-list" class="flex-grow overflow-y-auto p-4 space-y-4">
-            <!-- 歷史項將在此載入 -->
-            <div class="text-center py-10 text-slate-400 text-sm">尚未有存檔紀錄</div>
-        </div>
-        <div class="p-4 border-t border-slate-100">
-            <p class="text-[10px] text-slate-400 text-center">歷史紀錄儲存於您的瀏覽器中</p>
+        <div id="history-list" class="flex-grow overflow-y-auto p-4 space-y-4 bg-slate-50"></div>
+        <div class="p-4 border-t border-slate-100 bg-white">
+            <p class="text-[10px] text-slate-400 text-center uppercase tracking-widest">Offline Storage Sync Enabled</p>
         </div>
     </div>
 
-    <!-- 簡易 Toast 提示 -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium z-[300] transition-opacity opacity-0 pointer-events-none">
-        存檔成功
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800/95 backdrop-blur text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium z-[300] transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+        已儲存
     </div>
 
     <script>
@@ -282,151 +271,64 @@
 
         function updatePreview() {
             views.communityName.innerText = inputs.communityName.value || '未設定社區名稱';
-            views.communityNameFoot.innerText = (inputs.communityName.value || '未設定').replace('管理委員會', '').replace('管委會', '');
+            views.communityNameFoot.innerText = (inputs.communityName.value || '未設定').replace('管理委員會', '').replace('管委會', '').replace('管理中心', '');
             views.id.innerText = inputs.noticeId.value || '______';
             views.date.innerText = inputs.noticeDate.value || '____年__月__日';
-            views.subject.innerText = inputs.subject.value || '（請輸入公告主旨）';
-            views.description.innerText = inputs.description.value || '（請輸入公告詳細說明內容...）';
+            views.subject.innerText = inputs.subject.value || '（未輸入主旨）';
+            views.description.innerText = inputs.description.value || '（未輸入內容）';
             views.department.innerText = inputs.department.value;
             views.footer.innerText = inputs.footer.value;
         }
 
-        // 監聽輸入
         Object.keys(inputs).forEach(key => {
-            if (key !== 'aiInput') {
-                inputs[key].addEventListener('input', updatePreview);
-            }
+            if (key !== 'aiInput') inputs[key].addEventListener('input', updatePreview);
         });
 
-        // 初始日期
         const today = new Date();
         const rocYear = today.getFullYear() - 1911;
         inputs.noticeDate.value = `${rocYear}年${today.getMonth() + 1}月${today.getDate()}日`;
-        
-        // 預設內容
-        inputs.subject.value = "社區外牆清洗作業通知";
-        inputs.description.value = "親愛的住戶您好：\n\n為維護社區整潔，預計於下週進行外牆清洗，請配合關閉門窗並移除陽台物品。造成不便敬請見諒。";
         updatePreview();
 
-        // --- 存檔功能 ---
         function showToast(text) {
             const toast = document.getElementById('toast');
             toast.innerText = text;
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2000);
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2500);
         }
 
-        function saveToHistory() {
-            const newItem = {
-                id: Date.now(),
-                communityName: inputs.communityName.value,
-                noticeId: inputs.noticeId.value,
-                noticeDate: inputs.noticeDate.value,
-                subject: inputs.subject.value,
-                description: inputs.description.value,
-                department: inputs.department.value,
-                footer: inputs.footer.value,
-                timestamp: new Date().toLocaleString()
-            };
-            
-            state.history.unshift(newItem);
-            if (state.history.length > 50) state.history.pop(); // 上限 50 筆
-            localStorage.setItem('notice_history', JSON.stringify(state.history));
-            renderHistory();
-            showToast('已儲存至歷史紀錄');
-        }
-
-        document.getElementById('save-btn').addEventListener('click', saveToHistory);
-
-        // --- 歷史紀錄渲染 ---
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            const badge = document.getElementById('history-badge');
-            
-            badge.innerText = state.history.length;
-            badge.classList.toggle('hidden', state.history.length === 0);
-
-            if (state.history.length === 0) {
-                list.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">尚未有存檔紀錄</div>';
-                return;
-            }
-
-            list.innerHTML = state.history.map(item => `
-                <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl group relative hover:border-red-200 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">${item.noticeId}</span>
-                        <span class="text-[10px] text-slate-400">${item.timestamp}</span>
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-800 line-clamp-1 mb-1">${item.subject}</h3>
-                    <p class="text-xs text-slate-500 line-clamp-2 mb-3">${item.description}</p>
-                    <div class="flex gap-2">
-                        <button onclick="loadHistoryItem(${item.id})" class="flex-grow bg-white border border-slate-200 hover:bg-slate-100 text-[11px] font-bold py-1.5 rounded-lg transition-colors">載入</button>
-                        <button onclick="deleteHistoryItem(${item.id})" class="px-2 text-slate-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" size="14"></i></button>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        window.loadHistoryItem = (id) => {
-            const item = state.history.find(h => h.id === id);
-            if (!item) return;
-
-            inputs.communityName.value = item.communityName;
-            inputs.noticeId.value = item.noticeId;
-            inputs.noticeDate.value = item.noticeDate;
-            inputs.subject.value = item.subject;
-            inputs.description.value = item.description;
-            inputs.department.value = item.department;
-            inputs.footer.value = item.footer;
-            
-            updatePreview();
-            document.getElementById('history-panel').classList.remove('active');
-            showToast('已載入存檔');
-        };
-
-        window.deleteHistoryItem = (id) => {
-            state.history = state.history.filter(h => h.id !== id);
-            localStorage.setItem('notice_history', JSON.stringify(state.history));
-            renderHistory();
-        };
-
-        // 面板切換
-        document.getElementById('toggle-history').addEventListener('click', () => {
-            document.getElementById('history-panel').classList.add('active');
-        });
-        document.getElementById('close-history').addEventListener('click', () => {
-            document.getElementById('history-panel').classList.remove('active');
-        });
-
-        // --- AI 生成邏輯 ---
+        // --- AI 生成邏輯 (修復版) ---
         const aiBtn = document.getElementById('ai-gen-btn');
         const aiBtnText = document.getElementById('ai-btn-text');
         const errorMsg = document.getElementById('error-msg');
 
-        aiBtn.addEventListener('click', async () => {
+        async function handleAiGenerate() {
             const prompt = inputs.aiInput.value.trim();
             if (!prompt || state.isAiLoading) return;
 
             state.isAiLoading = true;
             aiBtn.disabled = true;
-            aiBtnText.innerText = 'AI 構思中...';
+            aiBtnText.innerText = '正在智慧構思...';
             errorMsg.classList.add('hidden');
 
-            const apiKey = ""; 
-            const systemPrompt = `你是一位資深的物業管理顧問。請生成一份正式的社區公告。
-            JSON 格式要求：
-            - subject: 公告核心主旨（精簡，20字內，不含細節日期）。
-            - description: 詳細內容（包含正式招呼、條列要點、注意事項、禮貌結語）。
-            確保主旨與內容區隔明確，內容不超過350字以利A4單頁呈現。`;
+            const apiKey = ""; // 執行環境將自動注入
+            const systemPrompt = `你是一位資深的社區管理顧問。請生成一份專業的社區公告。
+            要求：
+            1. subject: 簡短的主旨（不含日期細節）。
+            2. description: 詳細說明內容（包含開場白、條列細節、注意事項、結尾語）。
+            請回傳 JSON 格式：{ "subject": "string", "description": "string" }。`;
 
-            async function fetchAi(retries = 3) {
+            // 指數退避重試邏輯 (1s, 2s, 4s, 8s, 16s)
+            async function fetchWithRetry(retries = 5, delay = 1000) {
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: `主題：${prompt}` }] }],
+                            contents: [{ parts: [{ text: `主題需求：${prompt}` }] }],
                             systemInstruction: { parts: [{ text: systemPrompt }] },
                             generationConfig: {
                                 responseMimeType: "application/json",
@@ -441,46 +343,118 @@
                             }
                         })
                     });
-                    if (!response.ok) throw new Error('API Error');
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const result = await response.json();
-                    return JSON.parse(result.candidates[0].content.parts[0].text);
+                    const textContent = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!textContent) throw new Error('No content received');
+                    return JSON.parse(textContent);
                 } catch (err) {
-                    if (retries > 0) return fetchAi(retries - 1);
+                    if (retries > 0) {
+                        await new Promise(r => setTimeout(r, delay));
+                        return fetchWithRetry(retries - 1, delay * 2);
+                    }
                     throw err;
                 }
             }
 
             try {
-                const data = await fetchAi();
+                const data = await fetchWithRetry();
                 inputs.subject.value = data.subject;
                 inputs.description.value = data.description;
                 inputs.aiInput.value = '';
                 updatePreview();
-                showToast('AI 生成成功');
+                showToast('AI 生成完成');
             } catch (err) {
-                errorMsg.innerText = 'AI 暫時離線，請手動輸入內容。';
+                errorMsg.innerText = 'AI 暫時離線或繁忙中，請手動輸入內容。';
                 errorMsg.classList.remove('hidden');
+                console.error('AI Error:', err);
             } finally {
                 state.isAiLoading = false;
                 aiBtn.disabled = false;
                 aiBtnText.innerText = '立即智慧生成';
             }
-        });
+        }
 
-        // --- PDF 下載邏輯 ---
-        const downloadBtn = document.getElementById('download-btn');
-        const btnText = document.getElementById('btn-text');
+        aiBtn.addEventListener('click', handleAiGenerate);
 
+        // --- 存檔與歷史 ---
+        function saveToHistory() {
+            const newItem = {
+                id: Date.now(),
+                communityName: inputs.communityName.value,
+                noticeId: inputs.noticeId.value,
+                noticeDate: inputs.noticeDate.value,
+                subject: inputs.subject.value,
+                description: inputs.description.value,
+                department: inputs.department.value,
+                footer: inputs.footer.value,
+                timestamp: new Date().toLocaleString()
+            };
+            state.history.unshift(newItem);
+            if (state.history.length > 50) state.history.pop();
+            localStorage.setItem('notice_history', JSON.stringify(state.history));
+            renderHistory();
+            showToast('公告已儲存');
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const badge = document.getElementById('history-badge');
+            badge.innerText = state.history.length;
+            badge.classList.toggle('hidden', state.history.length === 0);
+            if (state.history.length === 0) {
+                list.innerHTML = '<div class="text-center py-20 text-slate-300 text-sm">尚未有存檔紀錄</div>';
+                return;
+            }
+            list.innerHTML = state.history.map(item => `
+                <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm hover:border-red-300 transition-all group">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[9px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">${item.noticeId}</span>
+                        <span class="text-[9px] text-slate-400">${item.timestamp}</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 line-clamp-1 mb-1">${item.subject}</h3>
+                    <p class="text-[11px] text-slate-500 line-clamp-2 mb-3">${item.description}</p>
+                    <div class="flex gap-2">
+                        <button onclick="loadHistoryItem(${item.id})" class="flex-grow bg-slate-900 text-white text-[11px] font-bold py-2 rounded-xl active:scale-95 transition-all">載入編輯</button>
+                        <button onclick="deleteHistoryItem(${item.id})" class="p-2 text-slate-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" size="16"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.loadHistoryItem = (id) => {
+            const item = state.history.find(h => h.id === id);
+            if (!item) return;
+            Object.keys(inputs).forEach(key => { if(inputs[key] && item[key]) inputs[key].value = item[key]; });
+            updatePreview();
+            document.getElementById('history-panel').classList.remove('active');
+            showToast('載入成功');
+        };
+
+        window.deleteHistoryItem = (id) => {
+            state.history = state.history.filter(h => h.id !== id);
+            localStorage.setItem('notice_history', JSON.stringify(state.history));
+            renderHistory();
+        };
+
+        document.getElementById('save-btn').addEventListener('click', saveToHistory);
+        document.getElementById('toggle-history').addEventListener('click', () => document.getElementById('history-panel').classList.add('active'));
+        document.getElementById('close-history').addEventListener('click', () => document.getElementById('history-panel').classList.remove('active'));
+
+        // --- PDF 下載 ---
         downloadBtn.addEventListener('click', async () => {
             if (state.isGenerating) return;
             state.isGenerating = true;
-            downloadBtn.classList.add('opacity-70');
-            btnText.innerText = '處理中...';
+            downloadBtn.classList.add('opacity-50');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin" size="18"></i> 轉檔中...`;
+            lucide.createIcons();
 
             try {
                 const element = document.getElementById('print-area');
                 const originalStyle = element.getAttribute('style');
-                
                 element.style.transform = 'none';
                 element.style.position = 'fixed';
                 element.style.top = '0';
@@ -488,32 +462,25 @@
                 element.style.zIndex = '-1';
                 element.style.margin = '0';
 
-                const canvas = await html2canvas(element, {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    width: 794,
-                    height: 1123
-                });
-
+                const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123 });
                 element.setAttribute('style', originalStyle);
 
-                const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-                pdf.save(`社區公告_${inputs.noticeId.value || Date.now()}.pdf`);
-
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
+                pdf.save(`社區公告_${inputs.noticeId.value || '無字號'}.pdf`);
+                showToast('PDF 已下載');
             } catch (err) {
                 console.error(err);
+                showToast('下載失敗');
             } finally {
                 state.isGenerating = false;
-                downloadBtn.classList.remove('opacity-70');
-                btnText.innerText = '下載 PDF';
+                downloadBtn.classList.remove('opacity-50');
+                downloadBtn.innerHTML = originalText;
+                lucide.createIcons();
             }
         });
 
-        // 初始載入紀錄
         renderHistory();
     </script>
 </body>
