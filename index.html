@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社區公告產生器 - AI 智慧版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&display=swap');
+        
+        :root {
+            --preview-zoom: 0.4;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .font-serif-tc {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        #print-area {
+            width: 210mm;
+            height: 297mm;
+            min-width: 210mm;
+            min-height: 297mm;
+            transform: scale(var(--preview-zoom));
+            transform-origin: top center;
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .preview-container {
+            height: calc(297mm * var(--preview-zoom) + 20px);
+        }
+
+        @media (min-width: 1024px) {
+            :root { --preview-zoom: 0.72; }
+        }
+        @media (min-width: 1280px) {
+            :root { --preview-zoom: 0.85; }
+        }
+        @media (max-width: 640px) {
+            :root { --preview-zoom: 0.35; }
+            #print-area {
+                margin-top: -20px;
+            }
+        }
+
+        #print-area::-webkit-scrollbar { display: none; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-4 sticky top-0 z-[100] flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-2">
+            <i data-lucide="file-text" class="text-red-500"></i>
+            <h1 class="font-bold tracking-tighter text-lg">SmartNotice HTML</h1>
+        </div>
+        <button id="download-btn" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 active:scale-95 text-white px-5 py-2 rounded-full text-sm font-bold transition-all shadow-lg">
+            <i data-lucide="download" size="18"></i>
+            <span id="btn-text">下載 PDF</span>
+        </button>
+    </header>
+
+    <main class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 p-4 md:p-8">
+        
+        <!-- 左側控制面板 -->
+        <div class="w-full lg:w-[400px] flex flex-col gap-6 shrink-0">
+            
+            <!-- AI 助理面板 -->
+            <section class="bg-gradient-to-br from-indigo-700 to-purple-800 p-6 rounded-[2rem] shadow-xl text-white">
+                <div class="flex items-center gap-2 mb-4">
+                    <i data-lucide="sparkles" class="text-yellow-400"></i>
+                    <h2 class="font-bold">AI 公告生成器</h2>
+                </div>
+                <textarea id="ai-input" placeholder="例如：通知住戶下週清洗水塔，暫停供水四小時..." class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-sm text-white placeholder:text-white/40 text-sm outline-none focus:bg-white/20 transition-all h-20 resize-none mb-3"></textarea>
+                <button id="ai-gen-btn" class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-indigo-950 py-3 rounded-2xl font-bold text-sm transition-all disabled:opacity-50">
+                    <i data-lucide="wand-2" size="18"></i>
+                    <span id="ai-btn-text">立即智慧生成</span>
+                </button>
+                <p id="error-msg" class="hidden mt-2 text-[10px] text-red-200 text-center"></p>
+            </section>
+
+            <!-- 手動編輯表單 -->
+            <section class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 text-slate-800 font-bold border-b pb-3 border-slate-100">
+                    <i data-lucide="align-left" class="text-red-600"></i>
+                    <h2>內容編輯</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">社區名稱</label>
+                        <input type="text" id="community-name" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm" value="幸福綠洲社區管理委員會">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">公告字號</label>
+                            <input type="text" id="notice-id" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm" value="1140852">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">公告日期</label>
+                            <input type="text" id="notice-date-input" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">公告主旨</label>
+                        <input type="text" id="subject" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" placeholder="輸入主旨">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">說明內容</label>
+                        <textarea id="description" rows="10" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed resize-none" placeholder="輸入詳細說明內容"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <input type="text" id="department" placeholder="單位" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs" value="物管中心 敬啟">
+                        <input type="text" id="footer" placeholder="備註" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs" value="如有任何疑問，請洽社區櫃檯：(02) 2345-6789">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 右側預覽區域 -->
+        <div class="flex-grow flex flex-col items-center overflow-visible">
+            <div class="mb-4 text-xs font-bold text-slate-400 flex items-center gap-2 uppercase tracking-widest">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                A4 直式預覽 (已優化說明高度)
+            </div>
+            
+            <div class="relative w-full flex justify-center preview-container">
+                <!-- A4 畫布 -->
+                <div id="print-area" class="overflow-hidden">
+                    <div class="h-full w-full p-[20mm] flex flex-col text-black font-serif-tc bg-white box-border">
+                        
+                        <!-- 頁首 (縮小字體與間距) -->
+                        <div class="text-center border-b-[6px] border-red-600 pb-4 mb-6 shrink-0">
+                            <h1 class="text-5xl font-black text-red-600 mb-2 tracking-[0.8em] ml-[0.8em]">公告</h1>
+                            <div id="view-community-name" class="text-xl font-bold tracking-[0.3em] uppercase">幸福綠洲社區管理委員會</div>
+                        </div>
+
+                        <!-- 元數據 (縮小字體) -->
+                        <div class="flex justify-between items-end mb-6 font-bold text-base shrink-0">
+                            <div class="border-b-[1px] border-slate-800 pb-0.5 px-3 text-slate-700">
+                                字第 <span id="view-id">1140852</span> 號
+                            </div>
+                            <div class="text-slate-700">中華民國 <span id="view-date">2025年4月1日</span></div>
+                        </div>
+
+                        <!-- 主旨 (縮減間距與標籤字體) -->
+                        <div class="bg-slate-50 border-l-[12px] border-slate-800 p-6 mb-6 shrink-0 shadow-sm">
+                            <span class="text-[10px] font-black text-slate-400 block mb-1 tracking-[0.2em]">【 公告主旨 SUBJECT 】</span>
+                            <h2 id="view-subject" class="text-2xl font-black leading-tight text-slate-900 min-h-[1.2em]">
+                                請輸入或生成主旨
+                            </h2>
+                        </div>
+
+                        <!-- 說明內容 (極大化高度區塊) -->
+                        <div class="flex-grow overflow-hidden px-2">
+                            <span class="text-[10px] font-black text-slate-400 block mb-3 tracking-[0.2em]">【 說明內容 DESCRIPTION 】</span>
+                            <div id="view-description" class="text-[1.3rem] leading-[1.8] whitespace-pre-wrap text-justify font-medium text-slate-800">
+                                請輸入詳細說明內容...
+                            </div>
+                        </div>
+
+                        <!-- 頁尾用印 -->
+                        <div class="mt-6 pt-6 border-t border-slate-100 shrink-0 flex justify-between items-end">
+                            <div class="max-w-[50%] space-y-2">
+                                <div class="flex items-center gap-2 text-slate-400 text-xs italic">
+                                    <i data-lucide="phone" size="12"></i>
+                                    <span id="view-footer">如有疑問請洽櫃台</span>
+                                </div>
+                                <div class="h-1 w-16 bg-red-600"></div>
+                            </div>
+                            
+                            <div class="text-right">
+                                <div id="view-community-name-foot" class="text-lg font-bold text-slate-600">幸福綠洲社區</div>
+                                <div id="view-department" class="text-3xl font-black mt-1 tracking-tighter text-slate-900">物管中心 敬啟</div>
+                                <div class="mt-2 flex justify-end">
+                                    <div class="w-24 h-24 border-2 border-red-500/20 rounded-full flex items-center justify-center text-red-500/20 font-black text-lg border-dashed transform rotate-12 select-none">
+                                        管委會印
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        const state = {
+            isAiLoading: false,
+            isGenerating: false
+        };
+
+        const inputs = {
+            communityName: document.getElementById('community-name'),
+            noticeId: document.getElementById('notice-id'),
+            noticeDate: document.getElementById('notice-date-input'),
+            subject: document.getElementById('subject'),
+            description: document.getElementById('description'),
+            department: document.getElementById('department'),
+            footer: document.getElementById('footer'),
+            aiInput: document.getElementById('ai-input')
+        };
+
+        const views = {
+            communityName: document.getElementById('view-community-name'),
+            communityNameFoot: document.getElementById('view-community-name-foot'),
+            id: document.getElementById('view-id'),
+            date: document.getElementById('view-date'),
+            subject: document.getElementById('view-subject'),
+            description: document.getElementById('view-description'),
+            department: document.getElementById('view-department'),
+            footer: document.getElementById('view-footer')
+        };
+
+        function updatePreview() {
+            views.communityName.innerText = inputs.communityName.value || '未設定社區名稱';
+            views.communityNameFoot.innerText = (inputs.communityName.value || '未設定').replace('管理委員會', '');
+            views.id.innerText = inputs.noticeId.value || '______';
+            views.date.innerText = inputs.noticeDate.value || '____年__月__日';
+            views.subject.innerText = inputs.subject.value || '（請輸入公告主旨）';
+            views.description.innerText = inputs.description.value || '（請輸入公告詳細說明內容...）';
+            views.department.innerText = inputs.department.value;
+            views.footer.innerText = inputs.footer.value;
+        }
+
+        // 監聽所有輸入欄位
+        Object.keys(inputs).forEach(key => {
+            if (key !== 'aiInput') {
+                inputs[key].addEventListener('input', updatePreview);
+            }
+        });
+
+        // 初始設定
+        const today = new Date();
+        const rocYear = today.getFullYear() - 1911;
+        inputs.noticeDate.value = `${rocYear}年${today.getMonth() + 1}月${today.getDate()}日`;
+        
+        // 範例資料
+        inputs.subject.value = "114年度春季外牆清洗通知";
+        inputs.description.value = "親愛的住戶您好：\n\n為維護社區建築美觀及整潔，管委會安排於下週進行外牆清洗作業，相關事項如下：\n\n1. 作業時間：114年4月10日（五）至 4月12日（日）08:00 - 17:00。\n2. 配合事項：請住戶於作業期間關閉門窗，並將陽台衣物、盆栽移往室內以免受污。\n3. 注意事項：作業期間會有高壓噴水噪音，敬請諒解。\n\n造成不便之處，敬請見諒。";
+        
+        updatePreview();
+
+        // AI 生成邏輯
+        const aiBtn = document.getElementById('ai-gen-btn');
+        const aiBtnText = document.getElementById('ai-btn-text');
+        const errorMsg = document.getElementById('error-msg');
+
+        aiBtn.addEventListener('click', async () => {
+            const prompt = inputs.aiInput.value.trim();
+            if (!prompt || state.isAiLoading) return;
+
+            state.isAiLoading = true;
+            aiBtn.disabled = true;
+            aiBtnText.innerText = '正在生成內容...';
+            errorMsg.classList.add('hidden');
+
+            const apiKey = ""; 
+            const systemPrompt = `你是一位專業的物業管理經理。請根據需求生成社區公告。
+            JSON 格式要求：
+            - subject: 公告核心主旨（精簡，20字內）。
+            - description: 詳細內容（包含開頭、條列要點、結語）。
+            主旨與內容必須完全分開，不要在主旨重複內容細節。`;
+
+            async function fetchAi(retries = 3) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: `主題：${prompt}` }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                            generationConfig: {
+                                responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        subject: { type: "STRING" },
+                                        description: { type: "STRING" }
+                                    },
+                                    required: ["subject", "description"]
+                                }
+                            }
+                        })
+                    });
+                    if (!response.ok) throw new Error('API Error');
+                    const result = await response.json();
+                    return JSON.parse(result.candidates[0].content.parts[0].text);
+                } catch (err) {
+                    if (retries > 0) return fetchAi(retries - 1);
+                    throw err;
+                }
+            }
+
+            try {
+                const data = await fetchAi();
+                inputs.subject.value = data.subject;
+                inputs.description.value = data.description;
+                inputs.aiInput.value = '';
+                updatePreview();
+            } catch (err) {
+                errorMsg.innerText = 'AI 生成失敗，請重試。';
+                errorMsg.classList.remove('hidden');
+            } finally {
+                state.isAiLoading = false;
+                aiBtn.disabled = false;
+                aiBtnText.innerText = '立即智慧生成';
+            }
+        });
+
+        // PDF 下載邏輯
+        const downloadBtn = document.getElementById('download-btn');
+        const btnText = document.getElementById('btn-text');
+
+        downloadBtn.addEventListener('click', async () => {
+            if (state.isGenerating) return;
+            state.isGenerating = true;
+            downloadBtn.classList.add('opacity-70');
+            btnText.innerText = '正在轉 PDF...';
+
+            try {
+                const element = document.getElementById('print-area');
+                const originalStyle = element.getAttribute('style');
+                
+                element.style.transform = 'none';
+                element.style.position = 'fixed';
+                element.style.top = '0';
+                element.style.left = '0';
+                element.style.zIndex = '-1';
+                element.style.margin = '0';
+
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: 794,
+                    height: 1123
+                });
+
+                element.setAttribute('style', originalStyle);
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                pdf.save(`社區公告_${inputs.noticeId.value || '無字號'}.pdf`);
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                state.isGenerating = false;
+                downloadBtn.classList.remove('opacity-70');
+                btnText.innerText = '下載 PDF';
+            }
+        });
+    </script>
+</body>
+</html>
+
